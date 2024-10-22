@@ -17,9 +17,22 @@ app.use(cors());
 app.use('/api/v1',products);
 app.use('/api/v1',orders);
 
+if (process.env.NODE_ENV == 'production') {
+    app.use(express.static(path.join(__dirname, '..', 'frontend',  'build')));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '..', 'frontend', 'build', 'index.html'))
+    });
+}
+
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
+
+
 
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server listening to port ${process.env.PORT} in ${process.env.NODE_ENV}`);
+    console.log(`Database url:${process.env.DB_URL}`);
 
 })

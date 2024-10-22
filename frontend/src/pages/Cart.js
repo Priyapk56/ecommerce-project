@@ -40,18 +40,27 @@ export default function Cart({cartItems, setCartItems}) {
     }
 
     function placeOrderHandler() {
-        fetch(process.env.REACT_APP_API_URL+'/order', {
+        fetch(process.env.REACT_APP_API_URL + '/order', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(cartItems)
         })
-        .then(() => { 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
             setCartItems([]); 
             setComplete(true);
-            toast.success("Order Success!")
+            toast.success("Order Success!");
         })
+        .catch(error => {
+            toast.error("Failed to place order: " + error.message);
+        });
     }
-
+    
 
 
     return  cartItems.length > 0 ? <Fragment>
@@ -60,7 +69,7 @@ export default function Cart({cartItems, setCartItems}) {
                     <div className="row d-flex justify-content-between">
                         <div className="col-12 col-lg-8">
                             {cartItems.map((item) =>
-                            (<Fragment>
+                            (<Fragment key={item.product._id}>
                                 <hr />
                                 <div className="cart-item">
                                     <div className="row">
